@@ -1,27 +1,30 @@
 import { ComponentClass } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Button, Text } from '@tarojs/components'
-import { AtButton } from 'taro-ui'
+import { View, Button, Text, Image } from '@tarojs/components'
+import { AtButton, AtSearchBar, AtIcon, AtToast } from 'taro-ui'
 import { connect } from '@tarojs/redux'
+import classnames from "classnames";
 
 import { add, minus, asyncAdd } from '../../actions/counter'
 
+import { signOut } from './services'
+
 import './index.scss'
 
-// #region 书写注意
-//
-// 目前 typescript 版本还无法在装饰器模式下将 Props 注入到 Taro.Component 中的 props 属性
-// 需要显示声明 connect 的参数类型并通过 interface 的方式指定 Taro.Component 子类的 props
-// 这样才能完成类型检查和 IDE 的自动提示
-// 使用函数模式则无此限制
-// ref: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20796
-//
-// #endregion
+
+type ListItemInfo = {
+  id: number;
+  coverImgUrl: string;
+  name: string;
+  trackCount: number;
+  playCount: number;
+};
 
 type PageStateProps = {
   counter: {
-    num: number
-  }
+    num: number,
+  },
+  song: PlaySong
 }
 
 type PageDispatchProps = {
@@ -32,7 +35,25 @@ type PageDispatchProps = {
 
 type PageOwnProps = {}
 
-type PageState = {}
+type PageState = {
+  searchValue: string;
+  userInfo: {
+    account: {
+      id: number;
+    };
+    level: number;
+    profile: {
+      avatarUrl: string;
+      backgroundUrl: string;
+      nickname: string;
+      eventCount: number;
+      newFollows: number;
+      followeds: number;
+      userId: number;
+    };
+  };
+  userCreateList: Array<ListItemInfo>
+}
 
 type IProps = PageStateProps & PageDispatchProps & PageOwnProps
 
@@ -40,62 +61,239 @@ interface Index {
   props: IProps;
 }
 
-@connect(({ counter }) => ({
-  counter
-}), (dispatch) => ({
-  add () {
-    dispatch(add())
-  },
-  dec () {
-    dispatch(minus())
-  },
-  asyncAdd () {
-    dispatch(asyncAdd())
-  }
-}))
-class Index extends Component {
+@connect(
+  (state) => ({
+    song: state.song,
+  }),
 
-    /**
-   * 指定config的类型声明为: Taro.Config
-   *
-   * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
-   * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
-   * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
-   */
-    config: Config = {
-    navigationBarTitleText: '首页'
+  (dispatch) => ({
+    add() {
+      dispatch(add())
+    },
+    dec() {
+      dispatch(minus())
+    },
+    asyncAdd() {
+      dispatch(asyncAdd())
+    }
+  }))
+class Index extends Component<IProps, PageState> {
+
+  config: Config = {
+    navigationBarTitleText: '我的'
   }
 
-  componentWillReceiveProps (nextProps) {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      searchValue: '',
+      userInfo: Taro.getStorageSync('userInfo'),
+      userCreateList: []
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
     console.log(this.props, nextProps)
   }
 
-  componentWillUnmount () { }
+  componentWillUnmount() { }
 
-  componentDidShow () { }
+  componentDidShow() { 
+    if (!this.state.userInfo) {
+      Taro.navigateTo({
+        url: "/pages/login/index"
+      });
+      return;
+    }
+  }
 
-  componentDidHide () { }
+  componentDidHide() { }
 
-  render () {
+  goSearch() {
+    Taro.navigateTo({
+      url: `/pages/search/index`
+    })
+  }
+
+  signOut() {
+    Taro.clearStorage();
+    signOut().then(res => {
+      console.log(res)
+    })
+
+    // Taro.redirectTo({
+    //   url: "/pages/login/index"
+    // })
+  }
+
+  jumpPage() {
+    Taro.navigateTo({
+      url: `/pages/${name}/index`
+    })
+  }
+  jumpEventPage() {
+    const { userId } = this.state.userInfo.profile
+    Taro.navigateTo({
+      url: `/pages/myEvents/index?uid=${userId}`
+    })
+  }
+  showToast() {
+    Taro.showToast({
+      title: '还没有实现',
+      icon: 'none'
+    })
+  }
+
+  goDetail({id, name}) {
+    Taro.navigateTo({
+      url: `/pages/playListDetail/index?id=${id}&name=${name}`
+    })
+  }
+
+  render() {
+    const { searchValue, userInfo, userCreateList } = this.state
+    if(!userInfo ) {
+     return null
+    }
     return (
-      <View className='index'>
-        <Button className='add_btn' onClick={this.props.add}>+</Button>
-        <Button className='dec_btn' onClick={this.props.dec}>-</Button>
-        <Button className='dec_btn' onClick={this.props.asyncAdd}>async</Button>
-        <View><Text>{this.props.counter.num}</Text></View>
-        <View><Text>Hello, World</Text></View>
-        <AtButton type='primary'>按钮文案</AtButton>
-        <AtButton type='secondary'>按钮文案</AtButton>
+      <View className={classnames({
+        my_container: true,
+        hasMusicBox: !!this.props.song.currentSongInfo.name
+      })}>
+        {/* 搜索框 */}
+        <View>
+          <AtSearchBar
+            actionName='搜一下'
+            value={searchValue}
+            onChange={this.goSearch.bind(this)}
+          />
+        </View>
+
+
+        {/* 用户信息栏 */}
+        <View className="header">
+          <View className="header__left">
+            <Image className="header__img" src={`${userInfo.profile.avatarUrl}?imageView&thumbnail=250x0`} />
+
+            <View className="header__info">
+              <View className="header__info__name">
+                {userInfo.profile.nickname}
+              </View>
+              <View>
+                <Text className="header__info__level" >lv:0</Text>
+              </View>
+            </View>
+          </View>
+
+          <AtIcon value="share-2" size="25" color="#d43c33" className="exit_icon" onClick={this.signOut.bind(this)} />
+        </View>
+        {/* 关注 */}
+        <View className="user_count">
+          <View className="user_count__sub" onClick={this.jumpEventPage.bind(this)}>
+            <View className="user_count__sub--num">
+              {userInfo.profile.eventCount || 0}
+            </View>
+            <View>动态</View>
+          </View>
+
+          <View
+            className="user_count__sub"
+            onClick={this.jumpPage.bind(this, "myFocus")}
+          >
+            <View className="user_count__sub--num">
+              {userInfo.profile.newFollows || 0}
+            </View>
+            <View>关注</View>
+          </View>
+          <View
+            className="user_count__sub"
+            onClick={this.jumpPage.bind(this, "myFans")}
+          >
+            <View className="user_count__sub--num">
+              {userInfo.profile.followeds || 0}
+            </View>
+            <View>粉丝</View>
+          </View>
+        </View>
+
+
+        {/* tab栏 */}
+        <View className="user_brief">
+          <View className="user_brief__item">
+            <Image className="user_brief__item__img" src={require('../../assets/images/my/recent_play.png')} />
+            <View className="user_brief__item__text" onClick={this.jumpPage.bind(this, 'recentPlay')}>
+              <Text>最近播放</Text>
+              <Text className="at-icon at-icon-chevron-right"></Text>
+            </View>
+          </View>
+          <View className="user_brief__item">
+            <Image
+              className="user_brief__item__img"
+              src={require("../../assets/images/my/my_radio.png")}
+            />
+            <View
+              className="user_brief__item__text"
+              onClick={this.showToast.bind(this)}
+            >
+              <Text>我的电台</Text>
+              <Text className="at-icon at-icon-chevron-right"></Text>
+            </View>
+          </View>
+          <View className="user_brief__item">
+            <Image
+              className="user_brief__item__img"
+              src={require("../../assets/images/my/my_collection_icon.png")}
+            />
+            <View
+              className="user_brief__item__text"
+              onClick={this.showToast.bind(this)}
+            >
+              <Text>我的收藏</Text>
+              <Text className="at-icon at-icon-chevron-right"></Text>
+            </View>
+          </View>
+        </View>
+
+
+        {/* 歌单 */}
+        <View className="user_playlist">
+          <View className="user_playlist__title">
+            我的歌单
+         <Text>{userCreateList.length}</Text>
+          </View>
+
+          {userCreateList.length == 0 ? <AtToast isOpened text="loading" icon="loading-3"></AtToast> : ''}
+
+          <View>
+            {
+              userCreateList.map(item => (
+                <View
+                  key={item.id}
+                  onClick={this.goDetail.bind(this, item)}
+                >
+                  <Image
+                    src={`${item.coverImgUrl}?imageView&thumbnail=250x0`}
+                    className="user_playlist__item__cover"
+                  />
+                  <View className="user_playlist__item__info">
+                    <View className="user_playlist__item__info__name">
+                      {item.name}
+                    </View>
+                    <View className="user_playlist__item__info__count">
+                      {item.trackCount}首, 播放{item.playCount}次
+                  </View>
+                  </View>
+                </View>
+              ))
+            }
+          </View>
+        </View>
+        
       </View>
     )
   }
 }
 
-// #region 导出注意
-//
-// 经过上面的声明后需要将导出的 Taro.Component 子类修改为子类本身的 props 属性
-// 这样在使用这个子类时 Ts 才不会提示缺少 JSX 类型参数错误
-//
-// #endregion
 
 export default Index as ComponentClass<PageOwnProps, PageState>

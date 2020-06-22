@@ -53,11 +53,11 @@ CMusic.defaultProps = {
   songInfo: {
     currentSongInfo: {
       id: 0,
-      name: "",
+      name: "哈口滴滴",
       ar: [],
       al: {
         picUrl: "",
-        name: ""
+        name: "23323"
       },
       url: "",
       lrcInfo: "",

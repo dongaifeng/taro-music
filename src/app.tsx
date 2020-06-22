@@ -6,6 +6,7 @@ import Index from './pages/index'
 import configStore from './store'
 import 'taro-ui/dist/style/index.scss' // 全局引入一次即可
 import './app.scss'
+// import "./assets/iconFont/icon.scss"; // 引入第三方图标
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -28,6 +29,7 @@ class App extends Component {
     pages: [
       'pages/index/index',
       'pages/me/index',
+      '/pages/login/index'
     ],
     window: {
       backgroundTextStyle: 'light',
