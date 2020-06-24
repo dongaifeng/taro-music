@@ -7,7 +7,7 @@ import classnames from "classnames";
 
 import { add, minus, asyncAdd } from '../../actions/counter'
 
-import { signOut } from './services'
+import { signOut, getPlayList } from './services'
 
 import './index.scss'
 
@@ -52,7 +52,8 @@ type PageState = {
       userId: number;
     };
   };
-  userCreateList: Array<ListItemInfo>
+  userCreateList: Array<ListItemInfo>,
+  userCollectList: Array<ListItemInfo>,
 }
 
 type IProps = PageStateProps & PageDispatchProps & PageOwnProps
@@ -89,7 +90,9 @@ class Index extends Component<IProps, PageState> {
     this.state = {
       searchValue: '',
       userInfo: Taro.getStorageSync('userInfo'),
-      userCreateList: []
+      userCreateList: [],
+      userCollectList: []
+
     }
   }
 
@@ -106,6 +109,7 @@ class Index extends Component<IProps, PageState> {
       });
       return;
     }
+    this.getPlayList();
   }
 
   componentDidHide() { }
@@ -151,8 +155,23 @@ class Index extends Component<IProps, PageState> {
     })
   }
 
+  getPlayList() {
+    const { userId } = this.state.userInfo.profile
+    getPlayList({uid: userId, limit: 300}).then(res => {
+      console.log(res, 'getPlayList')
+      if(res.playlist && res.playlist.length > 0) {
+        this.setState({
+          userCreateList: res.playlist,
+          userCollectList: res.playlist
+        })
+      }
+    })
+
+  }
+
   render() {
     const { searchValue, userInfo, userCreateList } = this.state
+    console.log(userCreateList, '-----------')
     if(!userInfo ) {
      return null
     }
@@ -260,33 +279,32 @@ class Index extends Component<IProps, PageState> {
         <View className="user_playlist">
           <View className="user_playlist__title">
             我的歌单
-         <Text>{userCreateList.length}</Text>
+            <Text className="user_playlist__title__desc">{userCreateList.length}</Text>
           </View>
 
           {userCreateList.length == 0 ? <AtToast isOpened text="loading" icon="loading-3"></AtToast> : ''}
 
           <View>
-            {
-              userCreateList.map(item => (
-                <View
-                  key={item.id}
-                  onClick={this.goDetail.bind(this, item)}
-                >
-                  <Image
-                    src={`${item.coverImgUrl}?imageView&thumbnail=250x0`}
-                    className="user_playlist__item__cover"
-                  />
-                  <View className="user_playlist__item__info">
-                    <View className="user_playlist__item__info__name">
-                      {item.name}
-                    </View>
-                    <View className="user_playlist__item__info__count">
-                      {item.trackCount}首, 播放{item.playCount}次
+            {userCreateList.map(item => (
+              <View
+                key={item.id}
+                className="user_playlist__item"
+                onClick={this.goDetail.bind(this, item)}
+              >
+                <Image
+                  className="user_playlist__item__cover"
+                  src={`${item.coverImgUrl}?imageView&thumbnail=250x0`}
+                />
+                <View className="user_playlist__item__info">
+                  <View className="user_playlist__item__info__name">
+                    {item.name}
                   </View>
+                  <View className="user_playlist__item__info__count">
+                    {item.trackCount}首, 播放{item.playCount}次
                   </View>
                 </View>
-              ))
-            }
+              </View>
+            ))}
           </View>
         </View>
         

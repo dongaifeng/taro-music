@@ -6,3 +6,9 @@ export function signOut() {
     url: '/logout',
   })
 }
+export function getPlayList(data) {
+  return http.get({
+    url: '/user/playlist',
+    data
+  })
+}
