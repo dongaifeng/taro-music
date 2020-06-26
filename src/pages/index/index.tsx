@@ -33,15 +33,15 @@ type PageDispatchProps = {
 type PageOwnProps = {}
 
 type PageState = {
-  current: number,
-  banners: Array<Banner>,
+  current: number
+  banners: Array<Banner>
   recommendPlayList: Array<{
-    name: string,
-    picUrl: string,
+    name: string
+    picUrl: string
     playCount: number
-  }>,
+  }>
   recommendDj: Array<{
-    name: string,
+    name: string
     picUrl: string
   }>
 }
@@ -61,13 +61,7 @@ type IProps = PageStateProps & PageDispatchProps & PageOwnProps
 )
 class Index extends Component<IProps, PageState> {
 
-  /**
- * 指定config的类型声明为: Taro.Config
- *
- * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
- * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
- * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
- */
+ 
   config: Config = {
     navigationBarTitleText: '首页'
   }
@@ -159,7 +153,8 @@ class Index extends Component<IProps, PageState> {
           indicatorActiveColor='#333'
           circular
           indicatorDots
-          autoplay>
+          autoplay
+        >
           {
             banners.map((item) => {
               return (
@@ -170,7 +165,7 @@ class Index extends Component<IProps, PageState> {
             })
           }
           </Swiper>
-          <View className="recommend_playlist">
+          <View className='recommend_playlist'>
             <View className='recommend_playlist__title'>推荐歌单</View>
 
             <View className='recommend_playlist__content'>
@@ -201,10 +196,10 @@ class Index extends Component<IProps, PageState> {
             <View className='recommend_playlist__content'>
               {
                 recommendDj.map((item, index) => (
-                  <View key={index} className="recommend_playlist__item">
+                  <View key={index} className='recommend_playlist__item'>
                     <Image
-                       src={item.picUrl+'?imageView&thumbnail=0x200'}
-                       className='recommend_playlist__item__cover'
+                      src={item.picUrl+'?imageView&thumbnail=0x200'}
+                      className='recommend_playlist__item__cover'
                     />
 
                     <View className='recommend_playlist__item__title'>{item.name}</View>
@@ -222,9 +217,9 @@ class Index extends Component<IProps, PageState> {
           isPlaying,
           canPlayList
         }} 
-        isHome={true}
-        onUpdatePlayStatus={ this.props.updateState.bind(this) }
-       />
+        isHome
+        onUpdatePlayStatus={this.props.updateState.bind(this)}
+      />
       </View>
     )
   }

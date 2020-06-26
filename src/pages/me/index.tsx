@@ -13,17 +13,17 @@ import './index.scss'
 
 
 type ListItemInfo = {
-  id: number;
-  coverImgUrl: string;
-  name: string;
-  trackCount: number;
-  playCount: number;
+  id: number
+  coverImgUrl: string
+  name: string
+  trackCount: number
+  playCount: number
 };
 
 type PageStateProps = {
   counter: {
-    num: number,
-  },
+    num: number
+  }
   song: PlaySong
 }
 
@@ -36,30 +36,30 @@ type PageDispatchProps = {
 type PageOwnProps = {}
 
 type PageState = {
-  searchValue: string;
+  searchValue: string
   userInfo: {
     account: {
-      id: number;
-    };
-    level: number;
+      id: number
+    }
+    level: number
     profile: {
-      avatarUrl: string;
-      backgroundUrl: string;
-      nickname: string;
-      eventCount: number;
-      newFollows: number;
-      followeds: number;
-      userId: number;
-    };
-  };
-  userCreateList: Array<ListItemInfo>,
-  userCollectList: Array<ListItemInfo>,
+      avatarUrl: string
+      backgroundUrl: string
+      nickname: string
+      eventCount: number
+      newFollows: number
+      followeds: number
+      userId: number
+    }
+  }
+  userCreateList: Array<ListItemInfo>
+  userCollectList: Array<ListItemInfo>
 }
 
 type IProps = PageStateProps & PageDispatchProps & PageOwnProps
 
 interface Index {
-  props: IProps;
+  props: IProps
 }
 
 @connect(
@@ -131,7 +131,7 @@ class Index extends Component<IProps, PageState> {
     // })
   }
 
-  jumpPage() {
+  jumpPage(name) {
     Taro.navigateTo({
       url: `/pages/${name}/index`
     })
@@ -179,7 +179,8 @@ class Index extends Component<IProps, PageState> {
       <View className={classnames({
         my_container: true,
         hasMusicBox: !!this.props.song.currentSongInfo.name
-      })}>
+      })}
+      >
         {/* 搜索框 */}
         <View>
           <AtSearchBar
@@ -191,45 +192,45 @@ class Index extends Component<IProps, PageState> {
 
 
         {/* 用户信息栏 */}
-        <View className="header">
-          <View className="header__left">
-            <Image className="header__img" src={`${userInfo.profile.avatarUrl}?imageView&thumbnail=250x0`} />
+        <View className='header'>
+          <View className='header__left'>
+            <Image className='header__img' src={`${userInfo.profile.avatarUrl}?imageView&thumbnail=250x0`} />
 
-            <View className="header__info">
-              <View className="header__info__name">
+            <View className='header__info'>
+              <View className='header__info__name'>
                 {userInfo.profile.nickname}
               </View>
               <View>
-                <Text className="header__info__level" >lv:0</Text>
+                <Text className='header__info__level' >lv:0</Text>
               </View>
             </View>
           </View>
 
-          <AtIcon value="share-2" size="25" color="#d43c33" className="exit_icon" onClick={this.signOut.bind(this)} />
+          <AtIcon value='share-2' size='25' color='#d43c33' className='exit_icon' onClick={this.signOut.bind(this)} />
         </View>
         {/* 关注 */}
-        <View className="user_count">
-          <View className="user_count__sub" onClick={this.jumpEventPage.bind(this)}>
-            <View className="user_count__sub--num">
+        <View className='user_count'>
+          <View className='user_count__sub' onClick={this.jumpEventPage.bind(this)}>
+            <View className='user_count__sub--num'>
               {userInfo.profile.eventCount || 0}
             </View>
             <View>动态</View>
           </View>
 
           <View
-            className="user_count__sub"
+            className='user_count__sub'
             onClick={this.jumpPage.bind(this, "myFocus")}
           >
-            <View className="user_count__sub--num">
+            <View className='user_count__sub--num'>
               {userInfo.profile.newFollows || 0}
             </View>
             <View>关注</View>
           </View>
           <View
-            className="user_count__sub"
+            className='user_count__sub'
             onClick={this.jumpPage.bind(this, "myFans")}
           >
-            <View className="user_count__sub--num">
+            <View className='user_count__sub--num'>
               {userInfo.profile.followeds || 0}
             </View>
             <View>粉丝</View>
@@ -238,68 +239,68 @@ class Index extends Component<IProps, PageState> {
 
 
         {/* tab栏 */}
-        <View className="user_brief">
-          <View className="user_brief__item">
-            <Image className="user_brief__item__img" src={require('../../assets/images/my/recent_play.png')} />
-            <View className="user_brief__item__text" onClick={this.jumpPage.bind(this, 'recentPlay')}>
+        <View className='user_brief'>
+          <View className='user_brief__item'>
+            <Image className='user_brief__item__img' src={require('../../assets/images/my/recent_play.png')} />
+            <View className='user_brief__item__text' onClick={this.jumpPage.bind(this, 'recentPlay')}>
               <Text>最近播放</Text>
-              <Text className="at-icon at-icon-chevron-right"></Text>
+              <Text className='at-icon at-icon-chevron-right'></Text>
             </View>
           </View>
-          <View className="user_brief__item">
+          <View className='user_brief__item'>
             <Image
-              className="user_brief__item__img"
+              className='user_brief__item__img'
               src={require("../../assets/images/my/my_radio.png")}
             />
             <View
-              className="user_brief__item__text"
+              className='user_brief__item__text'
               onClick={this.showToast.bind(this)}
             >
               <Text>我的电台</Text>
-              <Text className="at-icon at-icon-chevron-right"></Text>
+              <Text className='at-icon at-icon-chevron-right'></Text>
             </View>
           </View>
-          <View className="user_brief__item">
+          <View className='user_brief__item'>
             <Image
-              className="user_brief__item__img"
+              className='user_brief__item__img'
               src={require("../../assets/images/my/my_collection_icon.png")}
             />
             <View
-              className="user_brief__item__text"
+              className='user_brief__item__text'
               onClick={this.showToast.bind(this)}
             >
               <Text>我的收藏</Text>
-              <Text className="at-icon at-icon-chevron-right"></Text>
+              <Text className='at-icon at-icon-chevron-right'></Text>
             </View>
           </View>
         </View>
 
 
         {/* 歌单 */}
-        <View className="user_playlist">
-          <View className="user_playlist__title">
+        <View className='user_playlist'>
+          <View className='user_playlist__title'>
             我的歌单
-            <Text className="user_playlist__title__desc">{userCreateList.length}</Text>
+            <Text className='user_playlist__title__desc'>{userCreateList.length}</Text>
           </View>
 
-          {userCreateList.length == 0 ? <AtToast isOpened text="loading" icon="loading-3"></AtToast> : ''}
+          {userCreateList.length == 0 ? <AtToast isOpened text='loading' icon='loading-3'></AtToast> : ''}
 
           <View>
             {userCreateList.map(item => (
               <View
                 key={item.id}
-                className="user_playlist__item"
+                className='user_playlist__item'
                 onClick={this.goDetail.bind(this, item)}
               >
                 <Image
-                  className="user_playlist__item__cover"
+                  className='user_playlist__item__cover'
                   src={`${item.coverImgUrl}?imageView&thumbnail=250x0`}
                 />
-                <View className="user_playlist__item__info">
-                  <View className="user_playlist__item__info__name">
+                <View className='user_playlist__item__info'>
+                  <View className='user_playlist__item__info__name'>
                     {item.name}
                   </View>
-                  <View className="user_playlist__item__info__count">
+                  <View className='user_playlist__item__info__count'>
                     {item.trackCount}首, 播放{item.playCount}次
                   </View>
                 </View>

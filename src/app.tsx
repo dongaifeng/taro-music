@@ -29,6 +29,8 @@ class App extends Component {
     pages: [
       'pages/index/index',
       'pages/me/index',
+      '/pages/playList/index',
+      '/pages/recentPlay/index',
       '/pages/login/index'
     ],
     window: {
