@@ -31,6 +31,8 @@ class App extends Component {
       'pages/me/index',
       '/pages/playList/index',
       '/pages/recentPlay/index',
+      '/pages/myFocus/index',
+      '/pages/myFans/index',
       '/pages/login/index'
     ],
     window: {

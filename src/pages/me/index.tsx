@@ -210,7 +210,7 @@ class Index extends Component<IProps, PageState> {
         </View>
         {/* 关注 */}
         <View className='user_count'>
-          <View className='user_count__sub' onClick={this.jumpEventPage.bind(this)}>
+          <View className='user_count__sub' onClick={this.jumpPage.bind(this, 'myFocus')}>
             <View className='user_count__sub--num'>
               {userInfo.profile.eventCount || 0}
             </View>
@@ -222,7 +222,7 @@ class Index extends Component<IProps, PageState> {
             onClick={this.jumpPage.bind(this, "myFocus")}
           >
             <View className='user_count__sub--num'>
-              {userInfo.profile.newFollows || 0}
+              {userInfo.profile.follows || 0}
             </View>
             <View>关注</View>
           </View>
@@ -231,7 +231,7 @@ class Index extends Component<IProps, PageState> {
             onClick={this.jumpPage.bind(this, "myFans")}
           >
             <View className='user_count__sub--num'>
-              {userInfo.profile.followeds || 0}
+              {userInfo.profile.followeds || 00}
             </View>
             <View>粉丝</View>
           </View>
