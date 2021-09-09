@@ -13,6 +13,7 @@ import "./index.scss";
 
 // 在bug分支修改bug
 // 测试 git stash 缓存修改
+// git stash List
 
 type ListItemInfo = {
   id: number;
